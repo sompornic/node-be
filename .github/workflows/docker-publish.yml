@@ -20,7 +20,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}  # ใช้ Secret สำหรับ username
           password: ${{ secrets.DOCKER_PASSWORD }}  # ใช้ Secret สำหรับ password
-
+      # check file
+      - name: Debug workspace files
+        run: ls -al
       # Step 3: Build Docker image
       - name: Build Docker image 
         run: |
