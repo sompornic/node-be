@@ -16,3 +16,4 @@ CMD ["npm", "start"]
 
 # เปิด port ที่จะใช้
 EXPOSE 3000
+  
