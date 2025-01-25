@@ -1,0 +1,18 @@
+# เลือก Base Image
+FROM node:22
+
+# ตั้ง working directory
+WORKDIR /app
+
+# คัดลอกไฟล์ package.json และติดตั้ง dependencies
+COPY package.json .
+RUN npm install
+
+# คัดลอกไฟล์ทั้งหมดในโปรเจกต์
+COPY . .
+
+# ระบุคำสั่งเริ่มต้น
+CMD ["npm", "start"]
+
+# เปิด port ที่จะใช้
+EXPOSE 3000
