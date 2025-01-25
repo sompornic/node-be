@@ -22,7 +22,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}  # ใช้ Secret สำหรับ password
 
       # Step 3: Build Docker image
-      - name: Build Docker image
+      - name: Build Docker image 
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/my-app:latest .
 
