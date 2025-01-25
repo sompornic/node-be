@@ -23,7 +23,7 @@ jobs:
       # check file
       - name: Debug workspace files
         run: ls -al
-      - name: Debug: Show Dockerfile content
+      - name: Debug Show Dockerfile content
         run: cat Dockerfile
       # Step 3: Build Docker image
       - name: Build Docker image
