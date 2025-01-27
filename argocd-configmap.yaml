@@ -6,9 +6,8 @@ metadata:
 data:
   registries.conf: |
     registries:
-    - name: Docker Hub
-      prefix: docker.io
-      api_url: https://registry-1.dcpker.io
-      credentials: pullsecret:argocd/dockerhub-secret
-      defaults: library
-      default: true
+      - name: Docker Hub
+        prefix: docker.io
+        api_url: https://registry-1.docker.io
+        credentials: pullsecret:argocd/dockerhub-secret
+        default: true
