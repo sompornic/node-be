@@ -6,8 +6,8 @@ metadata:
     app: my-app
   annotations:
     argocd-image-updater.argoproj.io/image-list: sompornic/my-app
-    argocd-image-updater.argoproj.io/myapp.update-strategy: latest
-    argocd-image-updater.argoproj.io/my-app.allow-tags: ^.*$
+    argocd-image-updater.argoproj.io/my-app.update-strategy: tag
+    argocd-image-updater.argoproj.io/my-app.tag-strategy: semver
 spec:
   replicas: 3
   selector:
@@ -23,4 +23,3 @@ spec:
         image: sompornic/my-app:latest
         ports:
         - containerPort: 3000
-        
