@@ -23,17 +23,9 @@ jobs:
 
       # Step 3: Build Docker image
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_ACCOUT }}/my-app:${{ github.sha }} -f ./Dockerfile .
+        run: docker build -t ${{ secrets.DOCKER_ACCOUT }}/my-app:latest -f ./Dockerfile .
 
       # Step 4: Push Docker image
       - name: Push Docker image
         run: | 
-          docker push ${{ secrets.DOCKER_ACCOUT }}/my-app:${{ github.sha }}
-
-      - name: Replace commit hash
-        run: |
-          sed -i "s/{{COMMIT_HASH}}/${{ github.sha }}/g" ./dev/my-app-deployment.yaml
-
-      - name: Deploy to Kubernetes
-        run: |
-          kubectl apply -f ./dev/my-app-deployment.yaml
+          docker push ${{ secrets.DOCKER_ACCOUT }}/my-app:latest
