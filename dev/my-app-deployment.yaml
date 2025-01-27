@@ -16,6 +16,5 @@ spec:
     spec:
       containers:
       - name: my-app
-        image: sompornic/my-app:<commit-hash>
         ports:
         - containerPort: 3000
