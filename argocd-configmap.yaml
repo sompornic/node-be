@@ -10,5 +10,5 @@ data:
       prefix: docker.io
       api_url: https://registry-1.dcpker.io
       credentials: pullsecret:argocd/dockerhub-secret
-      defualtns: library
-      defualt: true
+      defaults: library
+      default: true
