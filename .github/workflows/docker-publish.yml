@@ -33,3 +33,7 @@ jobs:
       - name: Replace commit hash
         run: |
           sed -i "s/{{COMMIT_HASH}}/${{ github.sha }}/g" ./dev/my-app-deployment.yaml
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f my-app-deployment.yaml
