@@ -32,4 +32,4 @@ jobs:
 
       - name: Replace commit hash
         run: |
-          sed -i "s/{{COMMIT_HASH}}/${{ github.sha }}/g" my-app-deployment.yaml
+          sed -i "s/{{COMMIT_HASH}}/${{ github.sha }}/g" ./dev/my-app-deployment.yaml
