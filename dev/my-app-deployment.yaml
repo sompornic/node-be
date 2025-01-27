@@ -4,9 +4,9 @@ metadata:
   name: my-app
   labels:
     app: my-app
- # annotations:
-    #argocd-image-updater.argoproj.io/image-list: sompornic/my-app
-    #argocd-image-updater.argoproj.io/myapp.update-strategy: latest
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: sompornic/my-app
+    argocd-image-updater.argoproj.io/myapp.update-strategy: latest
 spec:
   replicas: 3
   selector:
