@@ -6,7 +6,7 @@ metadata:
   annotations:
     argocd-image-updater.argoproj.io/image-list: sompornic/my-app
     argocd-image-updater.argoproj.io/myapp.update-strategy: git
-    argocd-image-updater.argoproj.io/git-commit-strategy: true
+    argocd-image-updater.argoproj.io/git-commit-strategy: "true"
 spec:
   project: default
   source:
