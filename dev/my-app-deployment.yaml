@@ -22,4 +22,3 @@ spec:
         image: sompornic/my-app:latest
         ports:
         - containerPort: 3000
-        
