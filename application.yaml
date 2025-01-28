@@ -15,4 +15,4 @@ spec:
   syncPolicy:  
     automated:
       prune: true # ลบ resource ที่ไม่จำเป็น  
-      selfHeal: true # Sync ใหม่เมื่อพบความคลาดเคลื่อน
+      selfHeal: true # Sync ใหม่เมื่อพบความคลาดเคลื่อน  
