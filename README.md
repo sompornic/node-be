@@ -40,4 +40,4 @@
             -   git: อัปเดต image tag ในไฟล์ manifest ใน Git repository
             -   argocd: อัปเดต image โดยตรงในแอปพลิเคชัน ArgoCD (ใน UI ของ ArgoCD)
             -   none: ไม่ทำการเขียนกลับ (เหมาะสำหรับสถานการณ์ที่ต้องการการตรวจสอบก่อนเขียนจริง)
-    ### ดูคัวอย่างได้จากในไฟล์ application.yaml ได้เลย
+    ### ดูคัวอย่างได้จากในไฟล์ application.yaml ได้เลย   
