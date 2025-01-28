@@ -1,0 +1,3 @@
+kustomize:
+  images:
+  - sompornic/my-app:v1.0.3
