@@ -23,8 +23,21 @@
         #### จ๊บบไป step ถัดไป
         -   สร้าง path for deploy app
             -   ในที่นี้เราสร้าง folder dev ไว้โดยข้างในมี deployment and service แบบง่ายงับ สามารถอ่านดูได้เลย
-        -   step ถัดมาทำการเขียนไฟล์ application.yaml ขึ้นมาเพื่อครั้งแรกเราจะใช้ kubectl apply ไปขึ้นไปครับ โดยที่ ในไฟล์นี้จะทำการไป deploy app เราให้โดยเราสามารถกำหนด NS ได้โดยอยู่ในส่่วน destination ครับ มันก็จะไปที่ repo ไปที่ branch ที่กำหนด แล้วเอาไป deploy ให้น่ะ ส่วนอื่นๆใน file มี comment อยู่ล่ะ
+        -   step ถัดมาทำการเขียนไฟล์ application.yaml ขึ้นมาเพื่อครั้งแรกเราจะใช้ kubectl apply ไปขึ้นไปครับ โดยที่ ในไฟล์นี้จะทำการไป deploy app เราให้โดยเราสามารถกำหนด NS ได้โดยอยู่ในส่่วน destination ครับ มันก็จะไปที่ repo ไปที่ branch ที่กำหนด แล้วเอาไป deploy ให้น่ะ ส่วนอื่นๆใน file มี comment อยู่ล่ะ ในที่นี้ใหทำการ fix images ไปก่อนนะจะได้ง่าย
+    ### มามาต่อๆๆ ถ้าอยากทำให้ deploy แบบ auto ต้องใช้ argo images updater ช่วย
+    -   let go
+        -   ทำการ install : kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/stable/manifests/install.yaml
+        -   แล้วทำการสร้าง secret(git-cred) password ต้องทำเป็น private access token (PAT) \
+        kubectl -n argocd-image-updater create secret generic git-creds --from-literal=username=someuser --from-literal=password=somepassword
+        -   แล้วปรับแก้ในไฟล์ application.yaml โดยเพิ่ม : annotations:
+        argocd-image-updater.argoproj.io/image-list \
+        argocd-image-updater.argoproj.io/myapp.update-strategy : กำหนดรูปแบบการอัปเดต (update strategy) สำหรับ image ในแอป โดยมี 3 แบบ
+            -   latest: อัปเดต image เป็น tag ล่าสุดเสมอ (อิงจาก latest tag)
+            -   semver: ใช้การอัปเดตตาม semantic versioning (เช่น 1.2.0 → 1.3.0)
+            -   name: อัปเดตโดยเปรียบเทียบตามลำดับชื่อของ image tag 
 
-
-### ติดส่วนชื่อ file Dockerfile เขียนผิด 555
-    ติดประมาณ 1 ชม ดัน push file Docker แบบ DockerFile ขึ้นไปบน repo แล้ว github action มันอ่านชื่อไฟล์ไม่ถูกที่ถูกต้องเป็น Dockerfile แบบนี้ 55555 แล้วไม่ได้ลบบน repo เราก็แก้ชื่อแล้ว push ขึ้นไป git มันก็มองว่าเป็น file เดียวกัน 55555 เลยต้องลบออก แล้ว push ไฟล์ขึ้นไปใหม่
+            argocd-image-updater.argoproj.io/write-back-method : หน้าที่: กำหนดวิธีที่ ArgoCD Image Updater จะอัปเดตข้อมูลกลับไปยัง repository หรือ manifest \
+            -   git: อัปเดต image tag ในไฟล์ manifest ใน Git repository
+            -   argocd: อัปเดต image โดยตรงในแอปพลิเคชัน ArgoCD (ใน UI ของ ArgoCD)
+            -   none: ไม่ทำการเขียนกลับ (เหมาะสำหรับสถานการณ์ที่ต้องการการตรวจสอบก่อนเขียนจริง)
+    ### ดูคัวอย่างได้จากในไฟล์ application.yaml ได้เลย
