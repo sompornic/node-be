@@ -4,9 +4,6 @@ metadata:
   name: my-app
   labels:
     app: my-app
-  annotations:
-    argocd-image-updater.argoproj.io/image-list: "sompornic/my-app"
-    argocd-image-updater.argoproj.io/myapp.image-regex: "^[a-f0-9]{7}$" 
 spec:
   replicas: 3
   selector:
@@ -19,6 +16,6 @@ spec:
     spec:
       containers:
       - name: my-app
-        image: "sompornic/my-app:latest"
+        image: sompornic/my-app:v1.0.0
         ports:
         - containerPort: 3000
