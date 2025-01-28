@@ -4,6 +4,10 @@ metadata:
   name: my-app
   labels:
     app: my-app
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: sompornic/my-app
+    argocd-image-updater.argoproj.io/myapp.image-regex: "^[a-f0-9]{7}$"
+    argocd-image-updater.argoproj.io/write-back-method: git:secret:argocd/git-creds
 spec:
   replicas: 3
   selector:
