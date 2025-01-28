@@ -18,5 +18,5 @@ spec:
     namespace: my-app # Namespace ที่ต้องการ deploy
   syncPolicy:
     automated:
-      prune: true # ลบ resource ที่ไม่จำเป็น
+      prune: true # ลบ resource ที่ไม่จำเป็น  
       selfHeal: true # Sync ใหม่เมื่อพบความคลาดเคลื่อน
