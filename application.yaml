@@ -4,9 +4,9 @@ metadata:
   name: my-app
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: sompornic/my-app
-    argocd-image-updater.argoproj.io/myapp.update-strategy: git
-    argocd-image-updater.argoproj.io/git-commit-strategy: "true"
+    argocd-image-updater.argoproj.io/image-list: sompornic/my-app:v1.x.x
+    argocd-image-updater.argoproj.io/myapp.update-strategy: semver
+    argocd-image-updater.argoproj.io/write-back-method: git
 spec:
   project: default
   source:
