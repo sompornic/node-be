@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: my-app
-        image: sompornic/my-app:v1.0.0
+        image: sompornic/my-app:latest
         ports:
         - containerPort: 3000
