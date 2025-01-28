@@ -16,7 +16,7 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc' # ใช้ค่า default สำหรับ cluster ปัจจุบัน
     namespace: my-app # Namespace ที่ต้องการ deploy
-  syncPolicy:
+  syncPolicy:  
     automated:
       prune: true # ลบ resource ที่ไม่จำเป็น  
       selfHeal: true # Sync ใหม่เมื่อพบความคลาดเคลื่อน
