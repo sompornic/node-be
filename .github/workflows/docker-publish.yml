@@ -3,7 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - develop  # Trigger workflow เมื่อมีการ push บน branch main
+      - main  # Trigger workflow เมื่อมีการ push บน branch main
 
 jobs:
   build:
