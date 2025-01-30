@@ -1,0 +1,3 @@
+image:
+  repository: my-app
+  tag: latest
