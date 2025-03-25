@@ -50,6 +50,8 @@ jobs:
 
       # Step 6: Commit และ Push การเปลี่ยนแปลงใน Helm Chart Repo
       - name: Commit & Push
+        permissions:
+          contents: write
         run: |
           cd helm-node/helm-node
           ls -lrt 
