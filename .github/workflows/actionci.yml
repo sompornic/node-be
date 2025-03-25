@@ -41,13 +41,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           path: helm-node  
 
+      - name: List Helm Repo Files
+        run: ls -R argocd-example-apps/
+
       # Step 5: Update values.yaml เพื่อใช้ Docker Image ใหม่
       - name: Update Helm values.yaml
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG|" argocd-example-apps/helm-repo/values.yaml
-
-      - name: List Helm Repo Files
-        run: ls -R argocd-example-apps/
 
       # Step 6: Commit และ Push การเปลี่ยนแปลงใน Helm Chart Repo
       - name: Commit & Push
