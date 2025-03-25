@@ -53,8 +53,8 @@ jobs:
         run: |
           cd helm-node/helm-node
           ls -lrt 
-          git config user.name ${{ secrets.USER_NAME_GIT }}
-          git config user.email ${{ secrets.EMAIL_GIT }}
-          git add values.yaml
+          git config user.name "sompornic"
+          git config user.email "sompron281040@gmail.com"
+          git add .
           git commit -m "Update image to ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG"
           git push
