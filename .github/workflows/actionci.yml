@@ -43,6 +43,7 @@ jobs:
           
       - name: Commit & Push
         run: |
+          cd helm-node
           ls -lrt
           pwd
 
