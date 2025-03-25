@@ -1,7 +1,4 @@
 name: Build and Deploy to Kubernetes
-permissions:
-  contents: write  # สิทธิ์ในการเขียนไฟล์ (push)
-  pull-requests: write  # ถ้าต้องการให้สามารถสร้างและจัดการ pull request
 
 on:
   push:
