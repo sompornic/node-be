@@ -36,28 +36,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Step 4: Checkout Helm Chart Repository
-      - name: Update Helm values.yaml via GitHub API
-        env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
-          REPO_OWNER: "sompornic"   # แทนที่ด้วย owner ของ repo เป้าหมาย
-          REPO_NAME: "argocd-example-apps"  # ชื่อ repo เป้าหมาย
-          FILE_PATH: "helm-node/values.yaml"
-          BRANCH: "master"
-        run: |
-          # ดึง SHA ของไฟล์ปัจจุบัน
-          FILE_SHA=$(curl -s -H "Authorization: token $GH_TOKEN" \
-            "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/contents/$FILE_PATH" | jq -r '.sha')
+    - name: Update Helm values.yaml via GitHub API
+      env:
+        GH_TOKEN: ${{ secrets.PAT_TOKEN }}   # ใช้ PAT Token ที่มีสิทธิ์ push
+        REPO_OWNER: "sompornic"   # เปลี่ยนเป็น owner ของ repo เป้าหมาย
+        REPO_NAME: "argocd-example-apps"  # ชื่อ repo เป้าหมาย
+        FILE_PATH: "helm-node/values.yaml" # ไฟล์ที่ต้องการแก้ไข
+        BRANCH: "master"  # Branch ที่ต้องการ push
+        IMAGE_TAG: "v1.0.6"  # แท็กใหม่ที่ต้องการเปลี่ยน
+      run: |
+        # ดึงข้อมูลไฟล์ values.yaml จาก GitHub API
+        RESPONSE=$(curl -s -H "Authorization: token $GH_TOKEN" \
+          "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/contents/$FILE_PATH")
 
-          # สร้าง JSON Payload สำหรับอัปเดตไฟล์
-          PAYLOAD=$(jq -n \
-            --arg path "$FILE_PATH" \
-            --arg message "Update image to ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG" \
-            --arg content "$(base64 -w 0 helm-node/values.yaml)" \
-            --arg sha "$FILE_SHA" \
-            '{ path: $path, message: $message, content: $content, sha: $sha }')
+        # ดึงค่า SHA ของไฟล์ปัจจุบัน
+        FILE_SHA=$(echo "$RESPONSE" | jq -r '.sha')
 
-          # ส่ง API Request เพื่ออัปเดตไฟล์
-          curl -X PUT -H "Authorization: token $GH_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "$PAYLOAD" \
-            "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/contents/$FILE_PATH"
+        # ดึงค่า content ของไฟล์แล้ว decode base64
+        FILE_CONTENT=$(echo "$RESPONSE" | jq -r '.content' | base64 -d)
+
+        # ใช้ sed แก้ไขค่า image.tag ใน YAML
+        UPDATED_CONTENT=$(echo "$FILE_CONTENT" | sed "s|tag: .*|tag: $IMAGE_TAG|")
+
+        # Encode ข้อมูลใหม่เป็น Base64
+        ENCODED_CONTENT=$(echo "$UPDATED_CONTENT" | base64 -w 0)
+
+        # สร้าง JSON Payload
+        PAYLOAD=$(jq -n \
+          --arg path "$FILE_PATH" \
+          --arg message "Update image.tag to $IMAGE_TAG" \
+          --arg content "$ENCODED_CONTENT" \
+          --arg sha "$FILE_SHA" \
+          '{ path: $path, message: $message, content: $content, sha: $sha }')
+
+        # ส่ง API Request เพื่ออัปเดตไฟล์ใน GitHub
+        curl -X PUT -H "Authorization: token $GH_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "$PAYLOAD" \
+          "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/contents/$FILE_PATH"
