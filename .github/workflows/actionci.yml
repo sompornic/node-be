@@ -57,7 +57,7 @@ jobs:
           cd helm-node/helm-node
           ls -lrt 
           git config user.name "sompornic"
-          git config user.email "sompron281040@gmail.com"
+          git config user.email "sompron281040@gmail.com"  
           git add .
           git commit -m "Update image to ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG"
           git pull  
