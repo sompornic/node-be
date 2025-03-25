@@ -3,7 +3,7 @@ name: Build and Deploy to Kubernetes
 on:
   push:
     branches:
-      - staging  # Trigger workflow เมื่อ push บน branch develop
+      - staging  # Trigger workflow เมื่อ push บน branch develo
 
 jobs:
   build:
@@ -52,8 +52,8 @@ jobs:
       - name: Commit & Push
         run: |
           cd helm-node/helm-node
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          git config user.name ${{ github.actor }}
+          git config user.email ${{ secrets.EMAIL_GIT }}
           git add values.yaml
           git commit -m "Update image to ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG"
           git push
