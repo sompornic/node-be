@@ -40,18 +40,13 @@ jobs:
           ref: "master"
           token: ${{ secrets.GITHUB_TOKEN }}
           path: helm-node  
-          
-      - name: Commit & Push
-        run: |
-          cd helm-node
-          ls -lrt
-          pwd
 
       # Step 5: Update values.yaml เพื่อใช้ Docker Image ใหม่
       - name: Update Helm values.yaml
         run: |
           cd helm-node/helm-node
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG|" values.yaml
+          sed -i "s|tag: .*|tag: $IMAGE_TAG|" values.yaml
+          cat values.yaml  # แสดงเนื้อหาของไฟล์ values.yaml
 
       # Step 6: Commit และ Push การเปลี่ยนแปลงใน Helm Chart Repo
       - name: Commit & Push
