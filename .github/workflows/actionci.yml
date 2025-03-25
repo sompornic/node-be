@@ -49,7 +49,7 @@ jobs:
       # Step 5: Update values.yaml เพื่อใช้ Docker Image ใหม่
       - name: Update Helm values.yaml
         run: |
-          cd ${{ github.workspace }}/helm-node
+          cd helm-node
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG|" values.yaml
 
       # Step 6: Commit และ Push การเปลี่ยนแปลงใน Helm Chart Repo
