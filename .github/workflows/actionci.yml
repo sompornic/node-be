@@ -57,5 +57,5 @@ jobs:
           git config user.email "sompron281040@gmail.com"
           git add .
           git commit -m "Update image to ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG"
-          git pull
+          git pull  
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
