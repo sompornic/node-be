@@ -52,8 +52,8 @@ jobs:
       - name: Commit & Push
         run: |
           cd helm-node/helm-node
-          git add .
+          git config user.name ${{ secrets.USER_NAME_GIT }}
+          git config user.email ${{ secrets.EMAIL_GIT }}
+          git add values.yaml
           git commit -m "Update image to ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG"
           git push
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
