@@ -36,27 +36,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Step 4: Checkout Helm Chart Repository
-      - name: Checkout Helm Chart Repo
-        uses: actions/checkout@v3
-        with:
-          repository: "sompornic/argocd-example-apps"  # เปลี่ยนเป็น repo ของ Helm Chart
-          ref: "master"
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: helm-node  
-
-      # Step 5: Update values.yaml เพื่อใช้ Docker Image ใหม่
-      - name: Update Helm values.yaml
+      - name: Update Helm values.yaml via GitHub API
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          REPO_OWNER: "sompornic"   # แทนที่ด้วย owner ของ repo เป้าหมาย
+          REPO_NAME: "argocd-example-apps"  # ชื่อ repo เป้าหมาย
+          FILE_PATH: "helm-node/values.yaml"
+          BRANCH: "master"
         run: |
-          cd helm-node/helm-node
-          sed -i "s|tag: .*|tag: $IMAGE_TAG|" values.yaml
-          cat values.yaml  # แสดงเนื้อหาของไฟล์ values.yaml
+          # ดึง SHA ของไฟล์ปัจจุบัน
+          FILE_SHA=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/contents/$FILE_PATH" | jq -r '.sha')
 
-      # Step 6: Commit และ Push การเปลี่ยนแปลงใน Helm Chart Repo
-      - name: Commit & Push Changes
-        run: |
-          cd helm-node/helm-node
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add values.yaml
-          git commit -m "Update image to ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG" || echo "No changes to commit"
-          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/sompornic/argocd-example-apps.git HEAD:master
+          # สร้าง JSON Payload สำหรับอัปเดตไฟล์
+          PAYLOAD=$(jq -n \
+            --arg path "$FILE_PATH" \
+            --arg message "Update image to ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG" \
+            --arg content "$(base64 -w 0 helm-node/values.yaml)" \
+            --arg sha "$FILE_SHA" \
+            '{ path: $path, message: $message, content: $content, sha: $sha }')
+
+          # ส่ง API Request เพื่ออัปเดตไฟล์
+          curl -X PUT -H "Authorization: token $GH_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/contents/$FILE_PATH"
