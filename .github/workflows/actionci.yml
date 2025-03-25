@@ -46,6 +46,9 @@ jobs:
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG|" argocd-example-apps/helm-repo/values.yaml
 
+      - name: List Helm Repo Files
+        run: ls -R argocd-example-apps/
+
       # Step 6: Commit และ Push การเปลี่ยนแปลงใน Helm Chart Repo
       - name: Commit & Push
         run: |
