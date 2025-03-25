@@ -39,7 +39,7 @@ jobs:
           repository: "sompornic/argocd-example-apps"  # เปลี่ยนเป็น repo ของ Helm Chart
           ref: "master"
           token: ${{ secrets.GH_TOKEN }}
-          path: helm-node
+          path: helm-node  
 
       # Step 5: Update values.yaml เพื่อใช้ Docker Image ใหม่
       - name: Update Helm values.yaml
