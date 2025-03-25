@@ -51,7 +51,7 @@ jobs:
       # Step 6: Commit และ Push การเปลี่ยนแปลงใน Helm Chart Repo
       - name: Commit & Push
         run: |
-          cd helm-node/helm-node
+          ls -lrt 
           git config user.name ${{ secrets.USER_NAME_GIT }}
           git config user.email ${{ secrets.EMAIL_GIT }}
           git add values.yaml
