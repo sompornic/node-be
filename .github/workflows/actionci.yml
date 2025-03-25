@@ -36,7 +36,7 @@ jobs:
       - name: Checkout Helm Chart Repo
         uses: actions/checkout@v3
         with:
-          repository: "sompornic/argocd-example-apps"  # เปลี่ยนเป็น repo ของ Helm Chart
+          repository: "sompornic/argocd-example-apps/helm-node"  # เปลี่ยนเป็น repo ของ Helm Chart
           ref: "master"
           token: ${{ secrets.GITHUB_TOKEN }}
           path: helm-node  
