@@ -27,6 +27,12 @@ jobs:
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
           docker build -t ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG -f ./Dockerfile .
           docker push ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG
+      
+      - name: Set IMAGE_TAG output
+        id: set_image_tag
+        run: echo "IMAGE_TAG=1.0.${{ github.run_number }}" >> $GITHUB_ENV
+        outputs:
+          IMAGE_TAG: ${{ steps.set_image_tag.outputs.IMAGE_TAG }}
 
   deploy:
     needs: build
@@ -40,7 +46,7 @@ jobs:
         REPO_NAME: "helm-app"  # ชื่อ repo เป้าหมาย
         FILE_PATH: "app1/values.yaml" # ไฟล์ที่ต้องการแก้ไข
         BRANCH: "main"  # Branch ที่ต้องการ push
-        #IMAGE_TAG: "v1.0.6"  # แท็กใหม่ที่ต้องการเปลี่ยน
+        IMAGE_TAG: ${{ needs.build.outputs.IMAGE_TAG }} # แท็กใหม่ที่ต้องการเปลี่ยน
       run: |
         # ดึงข้อมูลไฟล์ values.yaml จาก GitHub API
         RESPONSE=$(curl -s -H "Authorization: token $GH_TOKEN" \
