@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      IMAGE_TAG: ${{ steps.build_image.outputs.IMAGE_TAG }}  # ส่งออก IMAGE_TAG จากขั้นตอน build_image
     steps:
       # Step 1: Checkout code
       - name: Checkout code
@@ -28,13 +30,7 @@ jobs:
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
           docker build -t ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG -f ./Dockerfile .
           docker push ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG
-
-      # Set IMAGE_TAG as an output to be used in the deploy job
-      - name: Set IMAGE_TAG output
-        id: set_image_tag
-        run: echo "IMAGE_TAG=1.0.${{ github.run_number }}" >> $GITHUB_ENV
-        outputs:
-          IMAGE_TAG: ${{ steps.set_image_tag.outputs.IMAGE_TAG }}
+          echo "::set-output name=IMAGE_TAG::$IMAGE_TAG"  # ส่งค่าผ่าน set-output
 
   deploy:
     needs: build
