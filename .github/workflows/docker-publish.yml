@@ -5,21 +5,13 @@ on:
     branches:
       - develop  # Trigger workflow เมื่อ push บน branch develop
 
-# env:
-#   IMAGE_TAG: "dev1.0.${{ github.run_number }}"
-#   GH_TOKEN: ${{ secrets.PAT_TOKEN }}   # ใช้ PAT Token ที่มีสิทธิ์ push
-#   REPO_OWNER: "sompornic"   # เปลี่ยนเป็น owner ของ repo เป้าหมาย
-#   REPO_NAME: "helm-app"  # ชื่อ repo เป้าหมาย
-#   FILE_PATH: "app1/values.yaml" # ไฟล์ที่ต้องการแก้ไข
-#   BRANCH: "main"  # Branch ที่ต้องการ push
-
 env:
-  APP_NAME: "telco-api-aggregator"
-  Deployment_name: "telco-api-aggregator"
-  APP_ENV: "on-prem"
-  CONTAINER_REPOSITORY: "ghcr.io"
-  OWNER_NAME: "corp-ais"
-  IMAGE_TAG: ${{ github.event.inputs.image_tag_version }}
+  IMAGE_TAG: "dev1.0.${{ github.run_number }}"
+  GH_TOKEN: ${{ secrets.PAT_TOKEN }}   # ใช้ PAT Token ที่มีสิทธิ์ push
+  REPO_OWNER: "sompornic"   # เปลี่ยนเป็น owner ของ repo เป้าหมาย
+  REPO_NAME: "helm-app"  # ชื่อ repo เป้าหมาย
+  FILE_PATH: "app1/values.yaml" # ไฟล์ที่ต้องการแก้ไข
+  BRANCH: "main"  # Branch ที่ต้องการ push
 
 jobs:
   build:
@@ -28,21 +20,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: "GHCR login"
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/login-action@v1
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
         with:
-          registry: ${{ env.CONTAINER_REPOSITORY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_USERNAME }}  
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push image
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: ${{ env.CONTAINER_REPOSITORY }}/${{ env.OWNER_NAME }}/${{ env.APP_NAME }}:${{ github.event.inputs.image_tag_version }}
+      - name: Build & Push Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG -f ./Dockerfile .
+          docker push ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG
 
   deploy:
     needs: build
@@ -51,7 +38,7 @@ jobs:
       - name: Update Helm values.yaml via GitHub API
         run: |
           RESPONSE=$(curl -s -H "Authorization: token $GH_TOKEN" \
-            "https://api.github.com/repos/$OWNER_NAME/$APP_NAME/contents/$FILE_PATH")
+            "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/contents/$FILE_PATH")
 
           FILE_SHA=$(echo "$RESPONSE" | jq -r '.sha')
           FILE_CONTENT=$(echo "$RESPONSE" | jq -r '.content' | base64 -d)
@@ -75,5 +62,5 @@ jobs:
           curl -X POST -H "Authorization: token $GH_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             -d '{"event_type": "deploy", "client_payload": {"zone": "dev"}}' \
-            "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/dispatches"   
+            "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/dispatches"
    
