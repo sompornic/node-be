@@ -63,3 +63,4 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             -d '{"event_type": "deploy", "client_payload": {"zone": "dev"}}' \
             "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/dispatches"
+   
