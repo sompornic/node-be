@@ -1,7 +1,7 @@
 name: Build and Deploy to Kubernetes
 
 on:
-  push:
+  push:   
     branches:
       - develop  # Trigger workflow เมื่อ push บน branch develop
 
