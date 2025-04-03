@@ -1,36 +1,65 @@
-name: Build and Push Docker Image
+name: Build and Deploy to Kubernetes
 
 on:
   push:
     branches:
-      - develop  # Trigger workflow เมื่อมีการ push บน branch main
+      - develop  # Trigger workflow เมื่อ push บน branch develop
+
+env:
+  IMAGE_TAG: "dev1.0.${{ github.run_number }}"
+  GH_TOKEN: ${{ secrets.PAT_TOKEN }}   # ใช้ PAT Token ที่มีสิทธิ์ push
+  REPO_OWNER: "sompornic"   # เปลี่ยนเป็น owner ของ repo เป้าหมาย
+  REPO_NAME: "helm-app"  # ชื่อ repo เป้าหมาย
+  FILE_PATH: "app1/values.yaml" # ไฟล์ที่ต้องการแก้ไข
+  BRANCH: "main"  # Branch ที่ต้องการ push
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Login to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}  # ใช้ Secret สำหรับ username
-          password: ${{ secrets.DOCKER_PASSWORD }}  # ใช้ Secret สำหรับ password
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # - name: Set Short Commit SHA
-      #   run: |
-      #     SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
-      #     echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_ENV
+      - name: Build & Push Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG -f ./Dockerfile .
+          docker push ${{ secrets.DOCKER_ACCOUT }}/my-app:$IMAGE_TAG
 
-      # Step 3: Build Docker image
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_ACCOUT }}/my-app:v1.0.6 -f ./Dockerfile .
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Helm values.yaml via GitHub API
+        run: |
+          RESPONSE=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/contents/$FILE_PATH")
 
-      # Step 4: Push Docker image
-      - name: Push Docker image
-        run: | 
-          docker push ${{ secrets.DOCKER_ACCOUT }}/my-app:v1.0.6
+          FILE_SHA=$(echo "$RESPONSE" | jq -r '.sha')
+          FILE_CONTENT=$(echo "$RESPONSE" | jq -r '.content' | base64 -d)
+          UPDATED_CONTENT=$(echo "$FILE_CONTENT" | sed "s|tag: .*|tag: $IMAGE_TAG|")
+          ENCODED_CONTENT=$(echo "$UPDATED_CONTENT" | base64 -w 0)
+
+          PAYLOAD=$(jq -n \
+            --arg path "$FILE_PATH" \
+            --arg message "Update image.tag to $IMAGE_TAG" \
+            --arg content "$ENCODED_CONTENT" \
+            --arg sha "$FILE_SHA" \
+            '{ path: $path, message: $message, content: $content, sha: $sha }')
+
+          curl -X PUT -H "Authorization: token $GH_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD" \
+            "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/contents/$FILE_PATH"
+
+      - name: Trigger Helm Deployment
+        run: |
+          curl -X POST -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{"event_type": "deploy", "client_payload": {"zone": "dev"}}' \
+            "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/dispatches"
