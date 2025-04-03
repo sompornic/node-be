@@ -32,7 +32,7 @@ jobs:
         with:
           registry: ${{ env.CONTAINER_REPOSITORY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.PAT_TOKEN }}
 
       - name: Build and push image
         if: ${{ github.event_name != 'pull_request' }}
