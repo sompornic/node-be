@@ -49,7 +49,7 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
           repository: sompornic/docker-runner
-          event-type: dev-push-images
+          event-type: push-images
           client-payload: |
             {
               "ref": "${{ github.ref }}",
