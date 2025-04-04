@@ -43,7 +43,7 @@ jobs:
           push: true
           tags: ${{ env.CONTAINER_REPOSITORY }}/${{ env.OWNER_NAME }}/${{ env.APP_NAME }}:${{env.IMAGE_TAG}}
 
-      - name: Repository Dispatch
+      - name: Repository Dispatch   
         if: ${{ github.event_name != 'pull_request' }}
         uses: peter-evans/repository-dispatch@v1
         with:
