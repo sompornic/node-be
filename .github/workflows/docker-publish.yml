@@ -1,4 +1,4 @@
-name: Dev zone Build
+name: Staging zone Build
 
 on:
   push:   
