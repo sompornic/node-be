@@ -57,7 +57,7 @@ jobs:
               "inputs": {
                 "repo": {  
                   "APP_NAME": "${{ env.APP_NAME }}",
-                  "APP_ENV": "${{ env.APP_ENV }}",
+                  "APP_ENV": "${{ env.APP_ENV }}",  
                   "IMAGE_TAG": "${{ env.IMAGE_TAG }}"
                 }
               }
