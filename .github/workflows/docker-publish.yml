@@ -1,36 +1,64 @@
-name: Build and Push Docker Image
+name: Dev zone Build
 
 on:
-  push:
+  push:   
     branches:
-      - develop  # Trigger workflow เมื่อมีการ push บน branch main
+      - develop  # Trigger workflow เมื่อ push บน branch develop
+
+
+env:
+  APP_NAME: node-be
+  APP_ENV: "staging"
+  CONTAINER_REPOSITORY: "ghcr.io"
+  OWNER_NAME: "sompornic"
+  IMAGE_TAG: "staging1.0.${{ github.run_number }}"
+  GIT_BRANCH: "staging"
 
 jobs:
-  build:
+  build-and-push:
+    name: Build
     runs-on: ubuntu-latest
-
+    environment: staging
     steps:
-      # Step 1: Checkout code
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Step 2: Login to Docker Hub
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}  # ใช้ Secret สำหรับ username
-          password: ${{ secrets.DOCKER_PASSWORD }}  # ใช้ Secret สำหรับ password
+          ref: staging   
 
-      # - name: Set Short Commit SHA
-      #   run: |
-      #     SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
-      #     echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_ENV
+      - name: "GHCR login"
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: docker/login-action@v1   
+        with:
+          registry: ${{ env.CONTAINER_REPOSITORY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.PAT_TOKEN }}
 
-      # Step 3: Build Docker image
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_ACCOUT }}/my-app:v1.0.6 -f ./Dockerfile .
+      - name: Build and push image   
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: docker/build-push-action@v2
+        with:
+          build-args: |
+            "ENV=${{ env.APP_ENV }}"
+          context: .
+          push: true
+          tags: ${{ env.CONTAINER_REPOSITORY }}/${{ env.OWNER_NAME }}/${{ env.APP_NAME }}:${{env.IMAGE_TAG}}
 
-      # Step 4: Push Docker image
-      - name: Push Docker image
-        run: | 
-          docker push ${{ secrets.DOCKER_ACCOUT }}/my-app:v1.0.6
+      - name: Repository Dispatch   
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          repository: sompornic/actionCD
+          event-type: push-deploy
+          client-payload: |
+            {
+              "ref": "${{ github.ref }}",
+              "sha": "${{ github.sha }}",
+              "inputs": {
+                "repo": {    
+                  "APP_NAME": "${{ env.APP_NAME }}",
+                  "APP_ENV": "${{ env.APP_ENV }}",  
+                  "IMAGE_TAG": "${{ env.IMAGE_TAG }}"
+                }
+              }
+            }   
