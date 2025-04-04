@@ -48,8 +48,8 @@ jobs:
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.PAT_TOKEN }}
-          repository: sompornic/docker-runner
-          event-type: push-images
+          repository: sompornic/actionCD
+          event-type: push-deploy
           client-payload: |
             {
               "ref": "${{ github.ref }}",
