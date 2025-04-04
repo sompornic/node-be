@@ -3,7 +3,7 @@ name: Dev zone Build
 on:
   push:   
     branches:
-      - develop  # Trigger workflow เมื่อ push บน branch develop
+      - staging  # Trigger workflow เมื่อ push บน branch develop
 
 
 env:
