@@ -9,7 +9,6 @@ on:
 env:
   APP_NAME: node-be
   APP_ENV: "dev"
-  Deployment_name: "node-be"
   CONTAINER_REPOSITORY: "ghcr.io"
   OWNER_NAME: "sompornic"
   IMAGE_TAG: "dev1.0.${{ github.run_number }}"
@@ -44,23 +43,22 @@ jobs:
           push: true
           tags: ${{ env.CONTAINER_REPOSITORY }}/${{ env.OWNER_NAME }}/${{ env.APP_NAME }}:${{env.IMAGE_TAG}}
 
-      # - name: Repository Dispatch
-      #   if: ${{ github.event_name != 'pull_request' }}
-      #   uses: peter-evans/repository-dispatch@v1
-      #   with:
-      #     token: ${{ secrets.REPO_ACCESS_TOKEN }}
-      #     repository: sompornic/node-be
-      #     event-type: sit-telco-api
-      #     client-payload: |
-      #       {
-      #         "ref": "${{ github.ref }}",
-      #         "sha": "${{ github.sha }}",
-      #         "inputs": {
-      #           "repo": {
-      #             "APP_NAME": "${{ env.APP_NAME }}",
-      #             "APP_ENV": "${{ env.APP_ENV }}",
-      #             "IMAGE_TAG": "${{ env.IMAGE_TAG }}",
-      #             "Deployment_name": "${{ env.Deployment_name }}"
-      #           }
-      #         }
-      #       }
+      - name: Repository Dispatch
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          repository: sompornic/docker-runner
+          event-type: dev-push-images
+          client-payload: |
+            {
+              "ref": "${{ github.ref }}",
+              "sha": "${{ github.sha }}",
+              "inputs": {
+                "repo": {
+                  "APP_NAME": "${{ env.APP_NAME }}",
+                  "APP_ENV": "${{ env.APP_ENV }}",
+                  "IMAGE_TAG": "${{ env.IMAGE_TAG }}"
+                }
+              }
+            }
