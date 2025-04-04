@@ -23,7 +23,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          ref: develop
+          ref: develop   
 
       - name: "GHCR login"
         if: ${{ github.event_name != 'pull_request' }}
