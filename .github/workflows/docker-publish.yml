@@ -35,7 +35,7 @@ jobs:
 
       - name: Build and push image   
         if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v2   
         with:
           build-args: |
             "ENV=${{ env.APP_ENV }}"
